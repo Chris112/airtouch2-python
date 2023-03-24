@@ -5,15 +5,18 @@ import logging
 import asyncio
 import aioconsole
 
-logging.basicConfig(filename='airtouch2plus.log',filemode='a', level=logging.DEBUG, format='%(asctime)s %(threadName)s %(levelname)s: %(message)s')
+logging.basicConfig(filename='airtouch2plus.log', filemode='a', level=logging.DEBUG,
+                    format='%(asctime)s %(threadName)s %(levelname)s: %(message)s')
 _LOGGER = logging.getLogger()
 _LOGGER.addHandler(logging.StreamHandler())
 logging.getLogger('asyncio').setLevel(logging.WARNING)
+
 
 class AcStatusLogger:
     client: At2PlusClient
     acs: list[At2PlusAircon]
     cleanup_callbacks: list[Callable]
+
     def __init__(self, client: At2PlusClient):
         self.cleanup_callbacks = []
         self.acs = []
@@ -25,11 +28,12 @@ class AcStatusLogger:
                 self.acs.append(ac)
                 _LOGGER.info(ac.status)
                 _LOGGER.info(ac.ability)
-                self.cleanup_callbacks.append(ac.add_callback(lambda : _LOGGER.info(ac.status)))
+                self.cleanup_callbacks.append(ac.add_callback(lambda: _LOGGER.info(ac.status)))
 
     def cleanup(self):
         while len(self.cleanup_callbacks) > 0:
             self.cleanup_callbacks.pop()()
+
 
 async def main():
     addr = await aioconsole.ainput("Enter airtouch2plus IP address: ")
